@@ -1,0 +1,42 @@
+
+
+---cummulative Analysis month over month sales
+--select * from salesfact
+WITH MonthlySales AS (
+    SELECT 
+        YEAR(date) AS SalesYear,
+        SUM(CAST(sales_amount AS INT)) AS Total_sales
+    FROM salesfact
+    GROUP BY YEAR(date) 
+)
+SELECT 
+    
+    salesyear,
+    Total_sales,
+    SUM(Total_sales) OVER (
+        ORDER BY SalesYear
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS RunningTotal
+FROM MonthlySales
+ORDER BY SalesYear;
+
+
+
+wiTH MonthlySales AS (
+    SELECT 
+        YEAR(date) AS SalesYear,
+        MONTH(date) AS SalesMonth,
+        FORMAT(date,'yyyy-MMMM') AS MonthName,
+        SUM(CAST(sales_amount AS INT)) AS Total_sales
+    FROM salesfact
+    GROUP BY YEAR(date), MONTH(date), FORMAT(date,'yyyy-MMMM')
+)
+SELECT 
+    MonthName,
+    Total_sales,
+    SUM(Total_sales) OVER (
+        ORDER BY SalesYear, SalesMonth
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS RunningTotal
+FROM MonthlySales
+ORDER BY SalesYear, SalesMonth;
